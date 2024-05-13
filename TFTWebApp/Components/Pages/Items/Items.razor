@@ -1,0 +1,130 @@
+﻿@page "/items/all"
+@rendermode InteractiveServer
+@using System.Net.Http
+@using System.Text.Json
+@using TFTWebApp.Core.Models
+@using System.Diagnostics.CodeAnalysis
+@using System.Diagnostics.Metrics
+@using Microsoft.AspNetCore.Html
+@using System.Text.RegularExpressions;
+@using TFTWebApp.Services
+@using TFTWebApp.Core.Constants
+
+<PageTitle>TFT Items</PageTitle>
+
+<div class="row row-cols-2">
+    <div class="col-3" style="background-color: goldenrod; height: 35vh;">
+        <div>
+            <SearchItems Items="items" OnSearch="UpdateSearchedItems"></SearchItems>
+        </div>
+        Components
+        <div class=" row m-2">
+            @foreach (string component in Constant.Components)
+            {
+                <ItemCheckBox Component="@component" OnClick="(isChecked) => UpdateSelectedCheckbox(SelectedComponent, component, isChecked)"></ItemCheckBox>
+            }
+        </div>
+    </div>
+    <div class="col-9">
+        <div class="row">
+            @foreach (var item in FilteredItems)
+            {
+                <div class="traitCard row row-cols-2 m-2" style="height: 170px; width: 530px;">
+                    <div class="col-3 g-0">
+                        @{
+                            var urlName = item.Name.Replace("'", "").Replace(" ", "").Replace(".", "");
+                            var itemImage = "img/items/TFT_Item_" + urlName + ".png";
+                        }
+                        <img src="@itemImage" alt="Example Image" class="fittedImg">
+                    </div>
+                    <div class="col-9">
+                        <span>@item.Name</span><br />
+                        @if (item.Composition != null && item.Composition.Length > 0)
+                        {
+                            <span>
+                                Components:
+                                <span>
+                                    <img src="img/items/@(item.Composition[0]).png" alt="@(item.Composition[0]) Icon" width="20" height="20" /> +
+                                    <img src="img/items/@(item.Composition[1]).png" alt="@(item.Composition[1]) Icon" width="20" height="20" />
+                                </span>
+                            </span>
+                            <br />
+                        }
+
+                        <span class="tab">Ability Description:</span>
+                        <DescriptionIcons description="@item.Description" />
+
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    List<Item> items = new List<Item>();
+    [Inject] HttpClient HttpClient { get; set; }
+
+    private List<Item> FilteredItems { get; set; } = new();
+    private List<string> SelectedComponent { get; set; } = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = await HttpClient.GetFromJsonAsync<List<Item>>("https://localhost:7299/items");
+
+        foreach (var item in items)
+        {
+            ItemDescriptionParser.ParseItem(item);
+        }
+
+        FilteredItems = items.ToList();
+    }
+
+    void UpdateSearchedItems(string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            FilteredItems = items.ToList();
+        }
+        else
+        {
+            FilteredItems = items.Where(
+
+                item => item.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                item.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+    }
+
+    void UpdateSelectedCheckbox<T>(List<T> selectedList, T item, bool isChecked)
+    {
+        if (!isChecked)
+        {
+            selectedList.Add(item);
+        }
+        else
+        {
+            selectedList.Remove(item);
+        }
+
+        FilteredCheckbox(SelectedComponent);
+    }
+
+    void FilteredCheckbox(List<string> SelectedComponent)
+    {
+        FilteredItems = items;
+
+        if (SelectedComponent.Count > 0)
+        {
+            FilteredItems = FilteredItems.Where(item =>
+            (item.Composition.Length == 2 && (SelectedComponent.Contains(item.Composition[0].Substring(9), StringComparer.OrdinalIgnoreCase) || (SelectedComponent.Contains(item.Composition[1].Substring(9), StringComparer.OrdinalIgnoreCase)))
+            || item.Composition.Length < 2 && SelectedComponent.Contains(item.ApiName.Substring(9), StringComparer.OrdinalIgnoreCase)))
+        .ToList();
+        }
+
+        FilteredItems = FilteredItems.ToList();
+    }
+}

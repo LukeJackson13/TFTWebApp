@@ -1,0 +1,145 @@
+﻿@page "/champions/all"
+@rendermode InteractiveServer
+@using System.Net.Http
+@using System.Text.Json
+@using TFTWebApp.Core.Models
+@using System.Diagnostics.CodeAnalysis
+@using System.Diagnostics.Metrics
+@using Microsoft.AspNetCore.Html
+@using System.Text.RegularExpressions;
+@using TFTWebApp.Core.Constants
+@using TFTWebApp.Services
+
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+<PageTitle>TFT Champions</PageTitle>
+
+<div class="row row-cols-2">
+    <div class="col-3" style="background-color: goldenrod; height: 75vh;">
+        <div>
+            <SearchChampions Items="champions" OnSearch="UpdateSearchedChampions"></SearchChampions>
+        </div>
+        Champion Cost
+        <div class=" row row-cols-3  m-2">
+            @for (int i = 1; i < 6; i++)
+            {
+                int currentcost = i;
+
+                <CostCheckbox Cost="currentcost" OnClick="(isChecked) => UpdateSelectedCheckbox(SelectedCosts, currentcost, isChecked)"></CostCheckbox>
+            }
+        </div>
+        TraitOrigin
+        <div class=" row row-cols-2 m-2">
+            @foreach (string trait in Constant.TraitOrigin)
+            {
+                <TraitCheckbox Trait="@trait" OnClick="(isChecked) => UpdateSelectedCheckbox(SelectedOriginTraits, trait, isChecked)"></TraitCheckbox>
+            }
+        </div>
+        TraitClass
+        <div class=" row row-cols-2 m-2">
+            @foreach (string trait in Constant.TraitClass)
+            {
+                <TraitCheckbox Trait="@trait" OnClick="(isChecked) => UpdateSelectedCheckbox(SelectedClassTraits,trait, isChecked)"></TraitCheckbox>
+            } 
+        </div>
+    </div>
+    <div class="col-9">
+        <div class="row m-2">
+            @foreach (var champion in FilteredChampions)
+            {
+                <a href="@($"https://localhost:7061/champions/{ChampionNameService.GetChampionName(champion)}")" class="championCard col-3 g-0 m-2 overflow-scroll no-select">
+                    <div>
+                        <img src="@ImageServices.GetChampionIconUrl(champion)" alt="@champion.Name Image" style="width: 100%;">
+                        <div class="Cost@(champion.Cost)" style="width: 100%; height: 40px;">
+                            <span class="m-2" style="width: 250px; display: inline-block;">@champion.Name</span><span>@champion.Cost</span>
+                        </div>
+                    </div>
+                    <div class="m-1">
+                        <span style="width: 150px; display: inline-block;">Traits:</span><span>@ChampionTraitServices.GetChampionTraits(champion)</span><br>
+                        <span style="width: 150px; display: inline-block;">Ability Name:</span><span>@champion.Ability.Name</span><br>
+                        <span style="width: 150px; display: inline-block;">Ability Description:</span>
+                    </div>
+                    <div class="m-2">
+                        <DescriptionIcons description="@champion.Ability.Description"/>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+
+    List<Champion> champions = new List<Champion>();
+
+    private List<Champion> FilteredChampions { get; set; } = new();
+    private string? SearchValue { get; set; }
+    private List<int> SelectedCosts { get; set; } = new List<int>();
+    private List<string> SelectedOriginTraits { get; set; } = new List<string>();
+    private List<string> SelectedClassTraits { get; set; } = new List<string>(); 
+
+    protected override async Task OnInitializedAsync()
+    {
+        champions = await HttpClient.GetFromJsonAsync<List<Champion>>("https://localhost:7299/champions/all/1/60");
+
+        foreach (var champion in champions)
+        {
+            AbilityDescriptionParser.ParseAbility(champion);
+        }
+
+        FilteredChampions = champions.ToList();
+    }
+
+    void UpdateSearchedChampions(string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            FilteredChampions = champions.ToList();
+        }
+        else
+        {
+            FilteredChampions = champions.Where(
+
+                champion => champion.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                champion.Ability.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+    }
+
+    void UpdateSelectedCheckbox<T>(List<T> selectedList, T item, bool isChecked)
+    {
+        if (!isChecked)
+        {
+            selectedList.Add(item);
+        }
+        else
+        {
+            selectedList.Remove(item);
+        }
+
+        FilteredCheckboxChampions(SelectedCosts, SelectedOriginTraits, SelectedClassTraits);
+    }
+
+    void FilteredCheckboxChampions(List<int> selectedCosts, List<string> SelectedOriginTraits, List<string> SelectedClassTraits)
+    {
+        FilteredChampions = champions;
+
+        if (selectedCosts.Count > 0)
+        {
+            FilteredChampions = FilteredChampions.Where(champion => selectedCosts.Contains(champion.Cost)).ToList();
+        }
+
+        if (SelectedOriginTraits.Count > 0)
+        {
+            FilteredChampions = FilteredChampions.Where(champion => champion.Traits.Any(trait => SelectedOriginTraits.Contains(trait.Name))).ToList();
+        }
+
+        if (SelectedClassTraits.Count > 0)
+        {
+            FilteredChampions = FilteredChampions.Where(champion => champion.Traits.Any(trait => SelectedClassTraits.Contains(trait.Name))).ToList();
+        }
+
+        FilteredChampions = FilteredChampions.ToList();
+    }
+}

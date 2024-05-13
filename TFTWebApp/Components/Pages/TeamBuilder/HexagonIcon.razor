@@ -1,0 +1,35 @@
+﻿<div class="hex" @onclick="HexagonClickedHandler">
+    <div class="hexagon-top @(isClicked ? "hexagon-glow" : "" )"></div>
+    <div class="hexagon-body @(isClicked ? "hexagon-glow" : "" )" style="@(ImageHelpers.GetChampionIconUrl(Champion))"></div>
+    <div class="hexagon-bottom @(isClicked ? "hexagon-glow" : "" )"></div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public int Row {get; set;}
+
+    [Parameter, EditorRequired]
+    public int Index {get; set;}
+
+    [Parameter, EditorRequired]
+    public EventCallback<(int, int)> HexagonClickedEvent {get; set;}
+
+    public Champion? Champion {get; set;}
+
+    private bool isClicked;
+
+    public void DeSelect()
+    {
+        isClicked = false;
+    }
+
+    public void SetSelected()
+    {
+        isClicked = true;
+    }
+
+    public async Task HexagonClickedHandler()
+    {
+        await HexagonClickedEvent.InvokeAsync((Row, Index));
+    }
+}

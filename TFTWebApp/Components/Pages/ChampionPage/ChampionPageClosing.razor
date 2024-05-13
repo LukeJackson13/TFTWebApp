@@ -1,0 +1,12 @@
+﻿@using TFTWebApp.Services
+
+<div>
+    The creators of the games Riot Games have create a universe which all the champions come from and have written detail backgrouds on each champion.
+    For more information about the background and character <span class="purpleBold">@champion.Name</span> you can
+    <a href="@($"https://universe.leagueoflegends.com/en_GB/story/champion/{ChampionNameService.GetChampionName(champion)}")">click here</a> to see the lore on this champion.
+</div><br/>
+
+@code {
+    [Parameter]
+    public Champion? champion { get; set; }
+}

@@ -1,0 +1,43 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">TFTWebApp</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="champions/all">
+                <span class="white-icon"><img src="img/HomePage/Champions_Icon.png" alt="Champion Icon" width='35' height='35' /></span><span style="margin-left: 5px;">Champions</span>
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="items/all">
+                <span class="white-icon"><img src="img/HomePage/Items_Icon.png" alt="Items Icon" width='30' height='30' /></span><span style="margin-left: 5px;">Items</span>
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="traits">
+                <span class="white-icon"><img src="img/HomePage/Traits_Icon.png" alt="Items Icon" width='25' height='25' /></span><span style="margin-left: 5px;">Traits</span>
+            </NavLink>
+        </div>
+
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="teamBuilder">
+                <span class="white-icon"><img src="img/HomePage/Team_Builder_Icon.png" alt="Items Icon" width='35' height='35' /></span><span style="margin-left: 5px;">TeamBuilder</span>
+            </NavLink>
+        </div>
+    </nav>
+</div>
+

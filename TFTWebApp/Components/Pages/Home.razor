@@ -1,0 +1,31 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, Welcome to my TFT WebApp</h1>
+
+<div>
+    <div>
+        Teamfight Tactics (TFT) is an exhilarating strategy game that puts your tactical prowess to the test in the heart of the League of Legends universe.
+        Developed by Riot Games, TFT is a standalone, free-to-play auto-battler where you build, upgrade, and strategically position a team of champions to outwit your opponents in fast-paced battles.<br /><br />
+
+        In TFT, you're not controlling champions directly; instead, you assemble a squad, known as a "composition," by purchasing and positioning champions on a grid-based battlefield.
+        Each champion belongs to a specific class and origin, offering unique synergies and abilities that can turn the tide of battle in your favor.
+        As the rounds progress, you'll earn gold, acquire more champions, and strategically spend resources to strengthen your team.
+        With each match, you'll need to adapt to ever-changing circumstances, anticipate your opponents' moves, and optimize your team composition to secure victory.
+
+        In this webapp I have collected information from the game so people can easily access information about the champions from the game, 
+        and also practice making different teams in the teambuilder.
+    </div><br/>
+    <img src="img/homepage/teamfighttactics_inkbornfables_keyart.jpg" style="display: block; margin: 0 auto;" /><br />
+    <div class="text-center">
+        <a href="https://teamfighttactics.leagueoflegends.com/en-gb/?utm_medium=card3%2Bwww.leagueoflegends.com&utm_source=riotbar">Click here</a> to go to the Riot Games website where you can download the game.
+    </div><br />
+    <div>
+        <img src="@image" alt="Items Icon" width="25" height="25" />
+    </div>
+</div>
+
+@code{
+    string image = "img/statsIcons/StatModsArmorIcon.png";
+}

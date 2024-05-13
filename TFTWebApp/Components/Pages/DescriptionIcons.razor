@@ -1,0 +1,27 @@
+﻿@using System.Text.RegularExpressions;
+
+<span>
+    @{
+        Regex percentRegex = new Regex(@"(%i:.*?%)");
+        string[] percentSeparatedParts = percentRegex.Split(description);
+
+        foreach (string part in percentSeparatedParts)
+        {
+            if (part.Contains("%i:scale"))
+            {
+                string iconType = part.Substring(8, part.Length - 9);
+                <img src="img/statsIcons/@(iconType)_Icon.png" alt="@(iconType) Icon" width="15" height="15" />
+            }
+            else
+            {
+                <text>@part</text>
+            }
+        }
+    }
+</span>
+
+
+@code {
+    [Parameter, EditorRequired]
+    public required string description { get; set; }
+}

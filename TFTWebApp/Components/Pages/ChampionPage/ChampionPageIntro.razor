@@ -1,0 +1,20 @@
+﻿@using TFTWebApp.Services
+
+<h1>@champion.Name</h1>
+<p>
+    <span class="purpleBold">@champion.Name</span> is a champion in the game TeamfightTactics a turn based strategy game, also know as TFT.
+    @if (champion.Name != "Kobuko")
+    {
+        <span>The champions are originally from the popular game League of legends and are adapted to be used in this game.</span>
+    }
+    Each champion possesses a unique ability, deployable once their mana bar is charged.
+    For example <span class="purpleBold">@champion.Name</span> has an ability called <span class="purpleBold">"@champion.Ability.Name"</span> which has this effect when cast: <span class="purpleBold">"<DescriptionIcons description="@champion.Ability.Description"/>"</span>.
+    TFT champions also have traits associated with them which can provide advantageous bonuses when mutiple of the champions on the board share the same traits.
+    Each trait has mutiple tiers of bonuses which are provided once the minimium threshold for the number of unique champions with that trait on the board has been reached.
+    <span class="purpleBold">@champion.Name</span> has the traits <span class="purpleBold">"@ChampionTraitServices.GetChampionTraits(champion)"</span>.
+</p>
+
+@code {
+    [Parameter]
+    public Champion? champion { get; set; }
+}

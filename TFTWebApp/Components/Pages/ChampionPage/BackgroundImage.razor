@@ -1,0 +1,8 @@
+﻿@using TFTWebApp.Services
+
+<div class="col-3 background-image" style='background-image: url("img/splash/@(ChampionNameService.GetChampionName(champion))_0.jpg"); background-position: 50%; height: 100vh'></div>
+
+@code {
+    [Parameter]
+    public Champion? champion { get; set; }
+}

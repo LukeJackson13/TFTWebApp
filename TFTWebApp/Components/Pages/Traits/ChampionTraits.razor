@@ -1,0 +1,57 @@
+﻿@page "/traits"
+@rendermode InteractiveServer
+@using System.Net.Http
+@using System.Text.Json
+@using TFTWebApp.Core.Models
+@using System.Diagnostics.CodeAnalysis
+@using System.Diagnostics.Metrics
+@using Microsoft.AspNetCore.Html
+@using System.Text.RegularExpressions;
+@using TFTWebApp.Core.Constants
+@using TFTWebApp.Services
+
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+<h2 class="text-center align-items-start">Champion Traits</h2>
+
+<div>
+    <div>
+        <div>
+            <TraitPageIntro />
+        </div><br />
+    </div>
+    <h3>Trait Origins</h3>
+    <div class="row row-cols-2">
+        @foreach (var trait in traitBreakpoints)
+        {
+            @if (Constant.TraitOrigin.Contains(trait.Name))
+            {
+                <TraitInfoCard trait="trait"/>
+            }
+        }
+    </div><br />
+    <h3>Trait Classes</h3>
+    <div class="row row-cols-2">
+        @foreach (var trait in traitBreakpoints)
+        {
+            @if (Constant.TraitClass.Contains(trait.Name))
+            {
+                <TraitInfoCard trait="trait" />
+            }
+        }
+    </div>
+</div>
+
+@code {
+    List<TraitBreakpoint> traitBreakpoints = [];
+    protected override async Task OnInitializedAsync()
+    {
+        traitBreakpoints = await HttpClient.GetFromJsonAsync<List<TraitBreakpoint>>("https://localhost:7299/teamBuilder/traits");
+
+        foreach (var trait in traitBreakpoints)
+        {
+            TraitDescriptionParse.ParseTrait(trait);
+        }
+    }
+}

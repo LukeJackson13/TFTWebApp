@@ -1,0 +1,28 @@
+﻿@using TFTWebApp.Services
+
+<div class="traitCard m-2" style="@($"height: {height}; width: {width};")">
+    <div style=" padding: 5px; margin: 2px; display: inline-block;">
+        <span>@trait.Name</span> <img src="@ImageServices.GetTraitIconUrl(trait.Name.Replace(" ", ""))" alt="@trait Icon" />
+        <br />
+        <span>
+            Trait Breakpoints:
+            @{
+                var breakpoints = ChampionTraitServices.TraitBreakpoints(trait);
+                var breakpointsString = string.Join(", ", breakpoints);
+            }
+            [@breakpointsString]
+        </span><br />
+        <span>Trait Description:  <DescriptionIcons description="@trait.Description"/></span>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required TraitBreakpoint trait { get; set; }
+
+    [Parameter, EditorRequired]
+    public required string height { get; set; }
+
+    [Parameter, EditorRequired]
+    public required string width { get; set; }
+}

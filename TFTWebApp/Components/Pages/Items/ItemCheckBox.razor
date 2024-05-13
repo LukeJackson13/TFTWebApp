@@ -1,0 +1,27 @@
+﻿@using TFTWebApp.Services
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="flexCheckDefault" @bind="IsChecked" @onclick="OnCheckboxClicked">
+    <label class="form-check-label" for="flexCheckDefault">
+        @(Component) <img src="img/items/TFT_Item_@(Component).png" alt="@Component Icon" width="20" height="20" />
+    </label>
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback<bool> OnClick { get; set; }
+
+    [Parameter]
+    public bool IsChecked { get; set; }
+
+    [Parameter]
+    public string Component { get; set; }
+
+    private async Task OnCheckboxClicked()
+    {
+        await OnClick.InvokeAsync(IsChecked);
+    }
+
+
+}

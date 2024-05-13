@@ -1,0 +1,83 @@
+﻿@page "/champions/{championName}"
+@rendermode InteractiveServer
+@using System.Net.Http
+@using System.Text.Json
+@using TFTWebApp.Core.Models
+@using System.Diagnostics.CodeAnalysis
+@using System.Diagnostics.Metrics
+@using Microsoft.AspNetCore.Html
+@using System.Text.RegularExpressions;
+@using TFTWebApp.Services
+@using TFTWebApp.Components.Pages.Traits
+
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+<div class="row row-cols-3">
+    @if (!isLoading)
+    {
+        <BackgroundImage champion="champion" />
+        <div class="col-6">
+            <div class="container">
+                <div class="row" style="display: inline-block">
+                    <ChampionPageIntro champion="champion" />
+                </div>
+                <div class="row">
+                    <div class="col-9">
+                        <h4>
+                            @champion.Name Traits
+                        </h4>
+                        <div>
+                            @foreach (var trait in championTraits)
+                            {
+                                <TraitInfoCard trait="trait" height="240px" width="550px" />
+                            }
+                        </div><br />
+                        @if (champion.Name != "Kobuko")
+                        {
+                            <ChampionPageClosing champion="champion" />
+                        }
+                    </div>
+                    <div class="col-3" style="background-color: goldenrod; height: 30vh; border: 2px solid black;">
+                        <StatsInfoBox champion="champion" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <BackgroundImage champion="champion" />
+    }
+</div>
+
+@code {
+    Champion champion = new Champion();
+    [Parameter]
+    public string championName { get; set; }
+
+    string imageName;
+    bool isLoading = true;
+    List<TraitBreakpoint> traitBreakpoints = [];
+    List<TraitBreakpoint> championTraits = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        champion = await HttpClient.GetFromJsonAsync<Champion>($"https://localhost:7299/champions/{championName}");
+
+        traitBreakpoints = await HttpClient.GetFromJsonAsync<List<TraitBreakpoint>>("https://localhost:7299/teamBuilder/traits");
+
+        AbilityDescriptionParser.ParseAbility(champion);
+
+        foreach (TraitBreakpoint trait in traitBreakpoints)
+        {
+            foreach (var championTrait in champion.Traits)
+            {
+                if (trait.Name.Contains(championTrait.Name))
+                {
+                    TraitDescriptionParse.ParseTrait(trait);
+
+                    championTraits.Add(trait);
+                }
+            }
+        }
+        isLoading = false;
+    }
+}

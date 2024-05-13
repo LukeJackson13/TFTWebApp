@@ -1,0 +1,226 @@
+﻿@page "/teamBuilder"
+@rendermode InteractiveServer
+@using System.Net.Http
+@using System.Text.Json
+@using System.Diagnostics.CodeAnalysis
+@using System.Diagnostics.Metrics
+@using Microsoft.AspNetCore.Html
+@using System.Text.RegularExpressions;
+@using TFTWebApp.Services
+
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+<div class="row row-cols-2">
+    <div class="col-3 overflow-scroll" style="background-color: goldenrod; height: 80vh;">
+        <div class="row row-cols-2">
+            @for (var i = 0; i < champions.Count; i++)
+            {
+                var championIndex = i;
+                var champion = champions[championIndex];
+
+                <ChampionIcon @ref="@(championIcons[championIndex])"
+                              Champion="@champion"
+                              ChampionClickedEvent=@((x) => ChampionClicked(x)) />
+            }
+        </div>
+    </div>
+
+    @if (hexagons.Any())
+    {
+        <div class="col-6 m-2">
+            <div class="row mb-5">
+                <div class="hex-row">
+                    @for (var i = 0; i < 7; i++)
+                    {
+                        var hexagonIndex = i;
+
+                        <HexagonIcon @ref="@(hexagons[hexagonIndex])"
+                                     Row=1
+                                     Index="@(i%7)"
+                                     HexagonClickedEvent=@( (args) => HexagonClicked(args.Item1, args.Item2)) />
+                    }
+                </div>
+
+                <div class="hex-row even">
+                    @for (var i = 7; i < 14; i++)
+                    {
+                        var hexagonIndex = i;
+
+                        <HexagonIcon @ref="@(hexagons[hexagonIndex])"
+                                     Row=2
+                                     Index="@(i%7)"
+                                     HexagonClickedEvent=@( (args) => HexagonClicked(args.Item1, args.Item2)) />
+                    }
+                </div>
+
+                <div class="hex-row">
+                    @for (var i = 14; i < 21; i++)
+                    {
+                        var hexagonIndex = i;
+
+                        <HexagonIcon @ref="@(hexagons[hexagonIndex])"
+                                     Row=3
+                                     Index="@(i%7)"
+                                     HexagonClickedEvent=@( (args) => HexagonClicked(args.Item1, args.Item2)) />
+                    }
+                </div>
+
+                <div class="hex-row even">
+                    @for (var i = 21; i < 28; i++)
+                    {
+                        var hexagonIndex = i;
+
+                        <HexagonIcon @ref="@(hexagons[hexagonIndex])"
+                                     Row=4
+                                     Index="@(i%7)"
+                                     HexagonClickedEvent=@( (args) => HexagonClicked(args.Item1, args.Item2)) />
+                    }
+                </div>
+            </div>
+
+            <button class="btn btn-primary" type="submit" @onclick="ClearBuilder">Clear</button>
+        </div>
+    }
+    <div class="col-2">
+        <div class="row row-cols-1 bg-dark text-white">
+            @if (traitCount.Any())
+            {
+                foreach (var trait in traitCount.OrderByDescending(pair => pair.Value).ThenBy(pair => pair.Key))
+                {
+                    string backgroundColor = ImageServices.GetIconColour(trait.Value, trait.Key, traitBreakpoints);
+
+                    <span style="background-color: @(backgroundColor); padding: 5px; margin: 2px; display: inline-block;" >@(trait.Key) : @(trait.Value) <img src="@ImageServices.GetTraitIconUrl(trait.Key.Replace(" ", ""))" alt="@trait Icon" /></span>
+                    
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    List<Champion> champions = [];
+    List<ChampionIcon> championIcons = [];
+    List<HexagonIcon> hexagons = [];
+
+    List<TraitBreakpoint> traitBreakpoints = [];
+
+    ChampionIcon? championSelected;
+    HexagonIcon? hexagonSelected;
+
+    Dictionary<string, int> traitCount = [];
+    List<string> championsOnBoard = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        champions = await HttpClient.GetFromJsonAsync<List<Champion>>("https://localhost:7299/teamBuilder");
+
+        traitBreakpoints = await HttpClient.GetFromJsonAsync<List<TraitBreakpoint>>("https://localhost:7299/teamBuilder/traits");
+
+        foreach (var champion in champions)
+        {
+            championIcons.Add(new ChampionIcon { Champion = champion });
+        }
+
+        foreach (var trait in traitBreakpoints)
+        {
+            TraitDescriptionParse.ParseTrait(trait);
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            for (var i = 0; i < 28; i++)
+            {
+                hexagons.Add(new HexagonIcon());
+            }
+        }
+    }
+
+    public void HexagonClicked(int row, int index)
+    {
+        var hexagonIndex = ((row - 1) * 7) + index;
+        var hexagonClicked = hexagons[hexagonIndex];
+
+        if (championSelected is not null)
+        {
+            hexagonClicked.Champion = championSelected.Champion;
+            SetTraits();
+
+            championSelected.DeSelect();
+            championSelected = null;
+        }
+        else
+        {
+            foreach (var hexagon in hexagons.Except(new List<HexagonIcon> { hexagonClicked }))
+            {
+                hexagon.DeSelect();
+            }
+
+            hexagonClicked.SetSelected();
+            hexagonSelected = hexagonClicked;
+        }
+    }
+
+    public void ChampionClicked(Champion champion)
+    {
+        var championIcon = championIcons.First(x => x.Champion == champion);
+
+        if (hexagonSelected is not null)
+        {
+            hexagonSelected.Champion = championIcon.Champion;
+            SetTraits();
+
+            hexagonSelected.DeSelect();
+            hexagonSelected = null;
+        }
+        else
+        {
+            foreach (var icon in championIcons.Except(new List<ChampionIcon> { championIcon }))
+            {
+                icon.DeSelect();
+            }
+
+            championIcon.SetSelected();
+            championSelected = championIcon;
+        }
+    }
+
+    public void ClearBuilder()
+    {
+        foreach (var hexagon in hexagons)
+        {
+            hexagon.Champion = null;
+        }
+
+        traitCount = [];
+    }
+
+    public void SetTraits()
+    {
+        traitCount = [];
+        var hexagonsWithChampions = hexagons
+            .Where(x => x.Champion is not null)
+            .GroupBy(x => x.Champion.Name)
+            .Select(group => group.First());
+
+        foreach (var hexagon in hexagonsWithChampions)
+        {
+            var traits = hexagon.Champion!.Traits;
+
+            foreach (var trait in traits)
+            {
+                if (traitCount.TryGetValue(trait.Name!, out var count))
+                {
+                    traitCount[trait.Name!] += 1;
+                }
+                else
+                {
+                    traitCount.Add(trait.Name!, 1);
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,16 @@
+﻿
+<h3>Stats</h3>
+<span style="width: 125px; display: inline-block;">Cost: </span><span>@champion.Cost</span>
+<span style="width: 125px; display: inline-block;">Health: </span><span>@champion.Stats.Hp</span>
+<span style="width: 125px; display: inline-block;">Mana: </span><span>@champion.Stats.Mana</span>
+<span style="width: 125px; display: inline-block;">Armor: </span><span>@champion.Stats.Armor</span>
+<span style="width: 125px; display: inline-block;">Magic Resit: </span><span>@champion.Stats.MagicResist</span>
+<span style="width: 125px; display: inline-block;">Damage: </span><span>@champion.Stats.Damage</span>
+<span style="width: 125px; display: inline-block;">Attack Speed: </span><span>@champion.Stats.AttackSpeed</span>
+<span style="width: 125px; display: inline-block;">Crit Rate: </span><span>@champion.Stats.CritChance</span>
+<span style="width: 125px; display: inline-block;">Range: </span><span>@champion.Stats.Range</span>
+
+@code {
+    [Parameter]
+    public Champion? champion { get; set; }
+}
