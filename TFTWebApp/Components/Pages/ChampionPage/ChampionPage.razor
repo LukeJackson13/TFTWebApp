@@ -55,18 +55,18 @@
 
     string imageName;
     bool isLoading = true;
-    List<TraitBreakpoint> traitBreakpoints = [];
+    List<TraitBreakpoint> traits = [];
     List<TraitBreakpoint> championTraits = [];
 
     protected override async Task OnInitializedAsync()
     {
         champion = await HttpClient.GetFromJsonAsync<Champion>($"https://localhost:7299/champions/{championName}");
 
-        traitBreakpoints = await HttpClient.GetFromJsonAsync<List<TraitBreakpoint>>("https://localhost:7299/teamBuilder/traits");
+        traits = await HttpClient.GetFromJsonAsync<List<TraitBreakpoint>>("https://localhost:7299/traits");
 
         AbilityDescriptionParser.ParseAbility(champion);
 
-        foreach (TraitBreakpoint trait in traitBreakpoints)
+        foreach (TraitBreakpoint trait in traits)
         {
             foreach (var championTrait in champion.Traits)
             {

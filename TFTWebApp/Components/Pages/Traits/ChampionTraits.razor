@@ -23,7 +23,7 @@
     </div>
     <h3>Trait Origins</h3>
     <div class="row row-cols-2">
-        @foreach (var trait in traitBreakpoints)
+        @foreach (var trait in traits)
         {
             @if (Constant.TraitOrigin.Contains(trait.Name))
             {
@@ -33,7 +33,7 @@
     </div><br />
     <h3>Trait Classes</h3>
     <div class="row row-cols-2">
-        @foreach (var trait in traitBreakpoints)
+        @foreach (var trait in traits)
         {
             @if (Constant.TraitClass.Contains(trait.Name))
             {
@@ -44,12 +44,12 @@
 </div>
 
 @code {
-    List<TraitBreakpoint> traitBreakpoints = [];
+    List<TraitBreakpoint> traits = [];
     protected override async Task OnInitializedAsync()
     {
-        traitBreakpoints = await HttpClient.GetFromJsonAsync<List<TraitBreakpoint>>("https://localhost:7299/teamBuilder/traits");
+        traits = await HttpClient.GetFromJsonAsync<List<TraitBreakpoint>>("https://localhost:7299/traits");
 
-        foreach (var trait in traitBreakpoints)
+        foreach (var trait in traits)
         {
             TraitDescriptionParse.ParseTrait(trait);
         }

@@ -70,7 +70,7 @@ namespace TFTWebApp.Api.Controllers
 
         }
         
-        [Route("all/{page}/{pageSize}")]
+        [Route("all")]
         [HttpGet]
         public string GetChampionsPageSize(int page, int pageSize)
         {
@@ -85,28 +85,13 @@ namespace TFTWebApp.Api.Controllers
                     .champions
                     .Where(x => x.name != "Tibbers" && x.name != "Voidspawn" && x.name != "Target Dummy")
                     .OrderBy(x => x.cost)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize);
+                    .Take(60);
 
                 var pagedChampionData = pagedJsonChampionData.Select(x => x.ToChampion());
 
                 return JsonSerializer.Serialize(pagedChampionData);
 
             }
-        }
-
-        [Route("traits/{traitName}/description")]
-        [HttpGet]
-        public string GetTraitDescription(string traitName)
-        {
-            using var reader = new StreamReader("Data/TFTData.json");
-
-            var jsonTFTData = reader.ReadToEnd();
-            var data = JsonSerializer.Deserialize<TFTData>(jsonTFTData);
-
-            var description = data.setData.First(x => x.number == 11).traits.FirstOrDefault(x => string.Equals(traitName, x.name, StringComparison.OrdinalIgnoreCase))?.desc ?? string.Empty;
-
-            return description;
         }
     }
 }

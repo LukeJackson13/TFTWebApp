@@ -113,9 +113,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        champions = await HttpClient.GetFromJsonAsync<List<Champion>>("https://localhost:7299/teamBuilder");
+        champions = await HttpClient.GetFromJsonAsync<List<Champion>>("https://localhost:7299/champions/all");
 
-        traitBreakpoints = await HttpClient.GetFromJsonAsync<List<TraitBreakpoint>>("https://localhost:7299/teamBuilder/traits");
+        traitBreakpoints = await HttpClient.GetFromJsonAsync<List<TraitBreakpoint>>("https://localhost:7299/traits");
 
         foreach (var champion in champions)
         {

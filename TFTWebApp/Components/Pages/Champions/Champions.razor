@@ -81,7 +81,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        champions = await HttpClient.GetFromJsonAsync<List<Champion>>("https://localhost:7299/champions/all/1/60");
+        champions = await HttpClient.GetFromJsonAsync<List<Champion>>("https://localhost:7299/champions/all");
 
         foreach (var champion in champions)
         {
