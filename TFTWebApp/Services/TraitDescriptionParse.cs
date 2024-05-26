@@ -2,6 +2,8 @@
 using System.Text.RegularExpressions;
 using TFTWebApp.Core.Models;
 
+// Parses the trait description replacing the @ tags with the values form the variables data
+
 namespace TFTWebApp.Services
 {
     public class TraitDescriptionParse

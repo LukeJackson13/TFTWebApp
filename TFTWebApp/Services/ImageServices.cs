@@ -9,7 +9,7 @@ namespace TFTWebApp.Services
             return $"img/traitIcons/Trait_Icon_11_{traitValue}.TFT_Set11.png";
         }
 
-        public static string GetIconColour(int traitNumber,string traitName, List<TraitBreakpoint> traitBreakpoints)
+        public static string GetTraitBreakpointColour(int traitNumber,string traitName, List<TraitBreakpoint> traitBreakpoints)
         {
             List<int> breakpoints = new List<int>();
 

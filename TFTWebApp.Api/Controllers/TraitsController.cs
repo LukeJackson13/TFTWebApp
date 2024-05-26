@@ -13,7 +13,7 @@ public class TraitsController : Controller
     [HttpGet]
     public string GetAllTraits()
     {
-        using (StreamReader reader = new StreamReader("Data/TFTData.json"))
+        using (StreamReader reader = new StreamReader("Data/champs-set-11.json"))
         {
             var jsonTFTData = reader.ReadToEnd();
             var data = JsonSerializer.Deserialize<TFTData>(jsonTFTData);
@@ -21,8 +21,7 @@ public class TraitsController : Controller
             var teambuilderChampiondata = data
                 .setData
                 .First(x => x.number == 11)
-                .traits
-                .Take(60);
+                .traits;
 
             var teambuilderChampionData = teambuilderChampiondata.Select(x => x.ToTraitBreakpoint());
 

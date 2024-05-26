@@ -56,7 +56,6 @@
 
                     </div>
                 </div>
-
             }
         </div>
     </div>
@@ -95,6 +94,7 @@
 
                 item => item.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 item.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+
             ).ToList();
         }
     }
@@ -120,7 +120,8 @@
         if (SelectedComponent.Count > 0)
         {
             FilteredItems = FilteredItems.Where(item =>
-            (item.Composition.Length == 2 && (SelectedComponent.Contains(item.Composition[0].Substring(9), StringComparer.OrdinalIgnoreCase) || (SelectedComponent.Contains(item.Composition[1].Substring(9), StringComparer.OrdinalIgnoreCase)))
+            (item.Composition.Length == 2 && (SelectedComponent.Contains(item.Composition[0].Substring(9), StringComparer.OrdinalIgnoreCase) 
+            || (SelectedComponent.Contains(item.Composition[1].Substring(9), StringComparer.OrdinalIgnoreCase)))
             || item.Composition.Length < 2 && SelectedComponent.Contains(item.ApiName.Substring(9), StringComparer.OrdinalIgnoreCase)))
         .ToList();
         }

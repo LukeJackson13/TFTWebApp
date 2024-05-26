@@ -1,6 +1,7 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using TFTWebApp.Core.Models;
+
+// Parses the item description replacing the @ tags with the values from the variables
 
 namespace TFTWebApp.Services
 {

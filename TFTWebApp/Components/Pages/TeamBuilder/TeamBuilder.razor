@@ -88,7 +88,7 @@
             {
                 foreach (var trait in traitCount.OrderByDescending(pair => pair.Value).ThenBy(pair => pair.Key))
                 {
-                    string backgroundColor = ImageServices.GetIconColour(trait.Value, trait.Key, traitBreakpoints);
+                    string backgroundColor = ImageServices.GetTraitBreakpointColour(trait.Value, trait.Key, traitBreakpoints);
 
                     <span style="background-color: @(backgroundColor); padding: 5px; margin: 2px; display: inline-block;" >@(trait.Key) : @(trait.Value) <img src="@ImageServices.GetTraitIconUrl(trait.Key.Replace(" ", ""))" alt="@trait Icon" /></span>
                     

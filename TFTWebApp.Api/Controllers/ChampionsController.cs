@@ -32,13 +32,12 @@ namespace TFTWebApp.Api.Controllers
                 .Include(champion => champion.Traits)
                 .SingleOrDefault(x => x.Name.Replace("'","").Replace(" ", "") == championName);
                 
-
             if (existingchampion is not null)
             {
                 return JsonSerializer.Serialize(existingchampion);
             }
 
-            using (StreamReader reader = new StreamReader("Data/TFTData.json"))
+            using (StreamReader reader = new StreamReader("Data/champs-set-11.json"))
             {
                 var jsonTFTData = reader.ReadToEnd();
                 var data = JsonSerializer.Deserialize<TFTData>(jsonTFTData);
@@ -51,7 +50,6 @@ namespace TFTWebApp.Api.Controllers
                         x?.name is not null &&
                         string.Equals(championName, x.name.Replace("'","").Replace(" ", ""), StringComparison.InvariantCultureIgnoreCase)) ;
 
-                
                 if (jsonChampion == null)
                 {
                     return "Champion not found";
@@ -67,14 +65,13 @@ namespace TFTWebApp.Api.Controllers
 
                 return JsonSerializer.Serialize(champion);
             }
-
         }
         
         [Route("all")]
         [HttpGet]
-        public string GetChampionsPageSize(int page, int pageSize)
+        public string GetAllChampions()
         {
-            using (StreamReader reader = new StreamReader("Data/TFTData.json"))
+            using (StreamReader reader = new StreamReader("Data/champs-set-11.json"))
             {
                 var jsonTFTData = reader.ReadToEnd();
                 var data = JsonSerializer.Deserialize<TFTData>(jsonTFTData);
@@ -83,9 +80,7 @@ namespace TFTWebApp.Api.Controllers
                     .setData
                     .First(x => x.number == 11)
                     .champions
-                    .Where(x => x.name != "Tibbers" && x.name != "Voidspawn" && x.name != "Target Dummy")
-                    .OrderBy(x => x.cost)
-                    .Take(60);
+                    .OrderBy(x => x.cost);
 
                 var pagedChampionData = pagedJsonChampionData.Select(x => x.ToChampion());
 

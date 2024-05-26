@@ -11,11 +11,12 @@ namespace TFTWebApp.Api.Helper
                 Name = jsonChampion.ability.name,
                 Description = jsonChampion.ability.desc,
                 Icon = jsonChampion.ability.icon,
-                Variables = jsonChampion.ability.variables.Select(x => new Variables {
+                Variables = jsonChampion.ability.variables.Select(x => new Variables
+                {
                     name = x.name,
                     value = x.value
                 }).ToList()
-               
+
             };
         }
 

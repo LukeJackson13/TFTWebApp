@@ -1,13 +1,14 @@
 ﻿using System.Globalization;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using TFTWebApp.Core.Models;
+
+// This code parses the description and replace the @ tags in the description with the correct values from the champion variables
 
 public static class AbilityDescriptionParser
 {
     public static void ParseAbility(Champion champion)
     {
-        //making adjustments to the variable names which are incorrectly matching to the wrong atTags
+        //making adjustments to the variable names which are incorrectly matching to the wrong atTags during the Levenshtein distance calculations
         foreach (var variable in champion.Ability.Variables)
         {
             if (variable.name.Contains("AD"))
@@ -48,8 +49,6 @@ public static class AbilityDescriptionParser
                     variable.name = variable.name.Replace(term, "");
                 }
             }
-
-
         }
 
         var abilityDescription = Regex.Replace(champion.Ability.Description, "<[^>]*>", string.Empty);
@@ -137,7 +136,7 @@ public static class AbilityDescriptionParser
                     variableValues[i] = (int)(variableValues[i] * 100);
                 }
             }
-            // If the @ sign uses the damage calculated before to calculate the 2nd damage
+            // If the @ sign relies on the prevoius calculation to calculate the 2nd value
             else if (mapping.Variable.Contains("SecondaryPercentage") || mapping.Variable.Contains("BonusPercentDamage") || mapping.Variable.Contains("TotalSpellTime"))
             {
                 if (mapping.Variable.Contains("TotalSpellTime"))
@@ -149,7 +148,7 @@ public static class AbilityDescriptionParser
                     variableValues[i] = (int)(variableValues[i] * PrimaryDamage[i]);
                 }
             }
-            // If the damage is a mix of scaling damage and flat damage and the Levenshtein has match with the scaling damage value
+            // If the damage is a mix of scaling damage and flat damage and the Levenshtein distance has matched with the scaling damage value
             else if (mapping.Variable.Contains("BonusResistsPct") || mapping.Variable.Contains("DamageSpellHit") 
                 || mapping.Variable.Contains("PercentAdditionalDamageSecondary") || mapping.Variable.Contains("FeatherRecallDamage"))
             {
@@ -170,7 +169,7 @@ public static class AbilityDescriptionParser
                 }
 
             }
-            // If the damage is a mix of scaling damage and flat damage and the Levenshtein has match with the flat damage value
+            // If the damage is a mix of scaling damage and flat damage and the Levenshtein distance has matched with the flat damage value
             else if (((mapping.AtSign.Contains("Total") || mapping.AtSign.Contains("Modified")) 
                 && (mapping.AtSign.Contains("Damage") || mapping.AtSign.Contains("Shield"))) 
                 && mapping.AtSign != "ModifiedShieldDamage" && !mapping.Variable.Contains("Percent") 
@@ -209,7 +208,7 @@ public static class AbilityDescriptionParser
 
 
             }
-            // If the damage is scaling damage
+            // If the damage is scaling damage only
             else if (((mapping.Variable.Contains("Percent") && (mapping.Variable.Contains("Damage") 
                 || mapping.Variable.Contains("HealthShield"))) || mapping.Variable.Contains("Ratio") 
                 || mapping.Variable.Contains("ShieldDamage") || mapping.Variable.Contains("BladeHit") || mapping.Variable.Contains("FeatherDamage")))
@@ -274,8 +273,6 @@ public static class AbilityDescriptionParser
                 scalingStatValue = (float)champion.Stats.Damage;
                 levelScaling = 1.5f;
                 break;
-
-
         }
     }
 }
